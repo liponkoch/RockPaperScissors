@@ -1,0 +1,443 @@
+<!-- A Rock Paper Scissors game using HTML CSS and Javascript -->  
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #38b000;
+            --warning: #ffbe0b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 2.8rem;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: -0.5px;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem;
+            width: 95%;
+            max-width: 800px;
+            text-align: center;
+            margin: 1rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(58, 134, 255, 0.1);
+            border-radius: 12px;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .score {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .score span {
+            display: block;
+            font-size: 2.2rem;
+            color: var(--primary);
+        }
+        
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+        
+        .choice {
+            width: 100%;
+            aspect-ratio: 1/1;
+            max-width: 120px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: white;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(26, 26, 46, 0.1);
+            border: none;
+        }
+        
+        .choice:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .choice:active {
+            transform: scale(0.95);
+        }
+        
+        .choice img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+        
+        .choice::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+            border-radius: 50%;
+        }
+        
+        .rock {
+            border: 5px solid #8b4513;
+        }
+        
+        .paper {
+            border: 5px solid #4169e1;
+        }
+        
+        .scissors {
+            border: 5px solid #ff6347;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            min-height: 100px;
+        }
+        
+        #result {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--dark);
+            transition: all 0.3s ease;
+        }
+        
+        .computer-choice {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+        
+        .computer-choice span {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .winner {
+            animation: pulse 0.5s ease;
+            color: var(--accent) !important;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .reset-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+        }
+        
+        .reset-btn:hover {
+            background-color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(75, 0, 130, 0.3);
+        }
+        
+        @media (max-width: 900px) {
+            .choice {
+                width: 100px;
+                height: 100px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 1.5rem;
+                margin: 0.5rem;
+                width: 100%;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .choices {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+            
+            .scoreboard {
+                flex-direction: row;
+                padding: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .choices {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+                margin: 1rem auto;
+            }
+            
+            .score {
+                font-size: 1.1rem;
+            }
+            
+            .score span {
+                font-size: 1.3rem;
+            }
+            
+            #result {
+                font-size: 1.3rem;
+            }
+        }
+
+        .history-container {
+            margin-top: 2rem;
+            text-align: left;
+            width: 100%;
+        }
+        
+        #history-log {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+        }
+        
+        .credit {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--dark);
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .credit a {
+            color: #808080;
+            text-decoration: none;
+            font-weight: normal;
+        }
+        
+        .heart {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .credit a:hover {
+            text-decoration: none;
+            color: #808080;
+        }
+        
+        .credit {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--dark);
+            opacity: 0.7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Rock Paper Scissors</h1>
+        
+        <div class="scoreboard">
+            <div class="score">
+                Player: <span id="player-score">0</span>
+            </div>
+            <div class="score">
+                Computer: <span id="computer-score">0</span>
+            </div>
+        </div>
+        
+        <div class="choices">
+            <div class="choice rock" data-choice="rock">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/aaba1774-31a0-4aae-a45d-20a30c53818f.png" alt="Rock hand gesture">
+            </div>
+            <div class="choice paper" data-choice="paper">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/6bb21115-dc72-46f3-8d67-d4f121df376c.png" alt="Paper hand gesture">
+            </div>
+            <div class="choice scissors" data-choice="scissors">
+                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/641e4bc4-ed71-4685-a6a2-d49dd97d25eb.png" alt="Scissors hand gesture">
+            </div>
+        </div>
+        
+        <div class="result-container">
+            <div id="result">Choose your weapon!</div>
+            <div class="computer-choice">Computer chose: <span id="computer-choice">?</span></div>
+        </div>
+        
+        <button class="reset-btn" id="reset">Reset Game</button>
+        
+        <div class="history-container">
+            <h3>Game History</h3>
+            <div id="history-log"></div>
+        </div>
+    </div>
+
+    <script>
+        const choices = document.querySelectorAll('.choice');
+        const playerScoreElement = document.getElementById('player-score');
+        const computerScoreElement = document.getElementById('computer-score');
+        const resultElement = document.getElementById('result');
+        const computerChoiceElement = document.getElementById('computer-choice');
+        const resetButton = document.getElementById('reset');
+        
+        let playerScore = 0;
+        let computerScore = 0;
+        
+        // Game logic
+        function playGame(playerChoice) {
+            // Computer makes random choice
+            const choices = ['rock', 'paper', 'scissors'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+            
+            // Update computer choice display
+            computerChoiceElement.textContent = computerChoice;
+            
+            // Determine winner
+            let result;
+            
+            if (playerChoice === computerChoice) {
+                result = "It's a tie!";
+                resultElement.classList.add('shake');
+            } else if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                result = "You win!";
+                playerScore++;
+                resultElement.classList.add('winner');
+            } else {
+                result = "Computer wins!";
+                computerScore++;
+                resultElement.classList.add('winner');
+            }
+            
+            // Update UI
+            resultElement.textContent = result;
+            playerScoreElement.textContent = playerScore;
+            computerScoreElement.textContent = computerScore;
+            
+            // Add to history
+            const historyLog = document.getElementById('history-log');
+            const historyEntry = document.createElement('div');
+            historyEntry.textContent = `You chose ${playerChoice}, computer chose ${computerChoice} - ${result}`;
+            historyLog.prepend(historyEntry);
+            
+            // Remove animation classes after they complete
+            setTimeout(() => {
+                resultElement.classList.remove('shake', 'winner');
+            }, 1000);
+        }
+        
+        // Event listeners
+        choices.forEach(choice => {
+            choice.addEventListener('click', () => {
+                const playerChoice = choice.getAttribute('data-choice');
+                playGame(playerChoice);
+                
+                // Add click effect
+                choice.classList.add('shake');
+                setTimeout(() => {
+                    choice.classList.remove('shake');
+                }, 500);
+            });
+        });
+        
+        resetButton.addEventListener('click', () => {
+            playerScore = 0;
+            computerScore = 0;
+            playerScoreElement.textContent = '0';
+            computerScoreElement.textContent = '0';
+            resultElement.textContent = 'Choose your weapon!';
+            computerChoiceElement.textContent = '?';
+            resultElement.classList.remove('winner');
+        });
+    </script>
+    <div class="credit">Made with <span class="heart" style="color:#ff0000">❤️</span> by <a href="#">liponkoch</a></div>
+</body>
+</html>
